@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="newsArticle"
+            type="com.example.newsapp.data.model.NewsArticle" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        style="@style/NewsArticle.View"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/card_elevation"
+        app:cardElevation="@dimen/card_elevation">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/newsImage"
+                android:scaleType="centerCrop"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/image_size"
+                android:layout_marginTop="0dp"
+                app:image="@{newsArticle.urlToImage}"
+                android:contentDescription="@string/news_image"
+                tools:src="@drawable/tools_placeholder" />
+
+            <TextView
+                android:id="@+id/newsAuthor"
+                style="@style/NewsArticle.Author"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{newsArticle.author}"
+                tools:text="ABC News" />
+
+            <!-- News Title -->
+            <TextView
+                android:id="@+id/newsTitle"
+                style="@style/NewsArticle.Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{newsArticle.title}"
+                tools:text="Elon Musk says Tesla can't yet launch in India" />
+
+            <!-- Publish at -->
+            <TextView
+                android:id="@+id/newsPublishedAt"
+                style="@style/NewsArticle.PublishedAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/normal_padding"
+                android:layout_marginLeft="@dimen/normal_padding"
+                android:text="@{newsArticle.publishedAt}"
+                tools:text="@string/str_test_date" />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+</layout>

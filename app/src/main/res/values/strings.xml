@@ -1,3 +1,21 @@
 <resources>
+    <!-- App details -->
     <string name="app_name">News App</string>
+
+    <!-- Content Description -->
+    <string name="news_image_desc">News Image</string>
+    <string name="news_image">news image</string>
+    <string name="str_test_date">22/02/2017</string>
+
+    <!-- Empty -->
+    <string name="no_news">No News</string>
+    <string name="title_select_country">Select your country</string>
+
+    <!--Country List-->
+    <string-array
+        name="country_list">
+        <item>us</item>
+        <item>ca</item>
+    </string-array>
+
 </resources>
