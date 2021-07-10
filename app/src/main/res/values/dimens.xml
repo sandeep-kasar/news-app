@@ -10,6 +10,7 @@
     <dimen name="normal_padding">10sp</dimen>
     <dimen name="textview_size_normal">14sp</dimen>
     <dimen name="image_size">180sp</dimen>
+    <dimen name="image_size_big">250dp</dimen>
     <dimen name="textview_size_small">12sp</dimen>
     <dimen name="small_padding">4dp</dimen>
     <dimen name="dim_select_country">45dp</dimen>

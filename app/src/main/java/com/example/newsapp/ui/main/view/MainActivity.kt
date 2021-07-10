@@ -1,5 +1,7 @@
 package com.example.newsapp.ui.main.view
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -51,15 +53,29 @@ class MainActivity : AppCompatActivity(), CountrySelectorDialog.SelectionDialogL
         supportActionBar!!.setCustomView(R.layout.country_selector)
         val view = supportActionBar!!.customView
         val countryCode = view.findViewById<View>(R.id.tvSelectCountry) as TextView
+        saveUsersChoice(countryCode.text.toString().trim())
+
         view.setOnClickListener {
             CountrySelectorDialog().show(supportFragmentManager,"countrySelector")
         }
+        swipeRefreshLayout.setOnRefreshListener {
+             setupObservers(countryCode.text.toString().trim())
+        }
 
-        setupObservers(countryCode.text.toString().trim())
     }
 
-    private fun setupObservers(countryCode:String) {
-        val apiUrl = RetrofitBuilder.SUB_URL_HEAD + countryCode + RetrofitBuilder.SUB_URL_TAIL
+    private fun setupObservers(country:String) {
+
+        val tvCountryCode = supportActionBar!!.customView
+            .findViewById<View>(R.id.tvSelectCountry) as TextView
+        tvCountryCode.text = country
+
+        if (swipeRefreshLayout.isRefreshing) {
+            swipeRefreshLayout.isRefreshing = false;
+        }
+
+        val apiUrl = RetrofitBuilder.SUB_URL_HEAD + country + RetrofitBuilder.SUB_URL_TAIL
+
         viewModel.getTopHeadlines(apiUrl).observe(this, Observer {
             it?.let { resource ->
                 when (resource.status) {
@@ -90,9 +106,31 @@ class MainActivity : AppCompatActivity(), CountrySelectorDialog.SelectionDialogL
     }
 
     override fun onCountryClick(country: String) {
-        val countryCode = supportActionBar!!.customView
-            .findViewById<View>(R.id.tvSelectCountry) as TextView
-        countryCode.text = country
-        setupObservers(country)
+        saveUsersChoice(country)
     }
+
+    private fun saveUsersChoice(countryCode: String){
+
+        val sharedPref = this?.getPreferences(Context.MODE_PRIVATE) ?: return
+        var country = sharedPref.getString("countryCode", "-1")
+
+        if (country == "-1"){
+            with (sharedPref.edit()) {
+                putString("countryCode", countryCode)
+                apply()
+            }
+            country = countryCode
+        }
+
+        if (country != "-1"){
+            with (sharedPref.edit()) {
+                putString("countryCode", countryCode)
+                apply()
+            }
+        }
+
+        country?.let { setupObservers(it) }
+
+    }
+
 }

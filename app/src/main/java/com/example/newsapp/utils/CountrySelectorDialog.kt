@@ -11,7 +11,7 @@ import com.example.newsapp.R
 
 class CountrySelectorDialog : DialogFragment() {
 
-    internal lateinit var listener: SelectionDialogListener
+    private lateinit var listener: SelectionDialogListener
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {

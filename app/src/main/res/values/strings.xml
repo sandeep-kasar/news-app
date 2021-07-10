@@ -10,10 +10,10 @@
     <!-- Empty -->
     <string name="no_news">No News</string>
     <string name="title_select_country">Select your country</string>
+    <string name="title_article">Article</string>
 
     <!--Country List-->
-    <string-array
-        name="country_list">
+    <string-array name="country_list">
         <item>us</item>
         <item>ca</item>
     </string-array>
