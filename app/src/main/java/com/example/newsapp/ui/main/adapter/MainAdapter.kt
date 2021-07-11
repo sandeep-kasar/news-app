@@ -11,6 +11,13 @@ import com.example.newsapp.data.model.NewsArticle
 import com.example.newsapp.databinding.RowNewsArticleBinding
 import com.example.newsapp.ui.main.view.NewsArticleDetail
 
+/**
+ * This is the main adapter, to display news article data
+ * data binding is used
+ *
+ * @author SandeepK
+ * @version 1.0
+ * */
 class MainAdapter(
     private val newsArticle: ArrayList<NewsArticle>,
 ) : RecyclerView.Adapter<MainAdapter.MainViewHolder>() {
@@ -34,7 +41,11 @@ class MainAdapter(
     override fun getItemCount(): Int = newsArticle.size
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
+
+        // get particular rows data
         holder.rowNewsArticleBinding.newsArticle = newsArticle[position]
+
+        // onclick row, open NewsArticleDetail activity
         holder.rowNewsArticleBinding.root.setOnClickListener {
             val context = holder.rowNewsArticleBinding.root.context
             val intent = Intent(context, NewsArticleDetail::class.java).apply {
@@ -42,11 +53,13 @@ class MainAdapter(
                 bundle.putSerializable("newsArticle", newsArticle[position])
                 putExtras(bundle)
             }
-
             context.startActivity(intent)
         }
     }
 
+    /**
+     * save news articles which we have received from API call
+     * */
     fun addNewsArticle(newsArticle: List<NewsArticle>) {
         this.newsArticle.apply {
             clear()

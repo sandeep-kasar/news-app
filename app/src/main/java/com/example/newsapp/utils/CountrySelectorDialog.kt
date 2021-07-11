@@ -8,6 +8,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.example.newsapp.R
 
+/**
+ * This DialogFragment is used to select the country
+ *
+ * @author SandeepK
+ * @version 1.0
+ */
 
 class CountrySelectorDialog : DialogFragment() {
 
@@ -25,6 +31,10 @@ class CountrySelectorDialog : DialogFragment() {
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 
+    /**
+     * This interface is used to return selected country to host activity
+     *
+     * */
     interface SelectionDialogListener {
         fun onCountryClick(country:String)
     }

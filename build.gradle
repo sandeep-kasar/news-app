@@ -1,6 +1,17 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
+
+    // Networking
+    ext.retrofitVersion = '2.7.1'
+    ext.okHttpVersion = '4.3.1'
+
+    // Kotlin
     ext.kotlin_version = "1.5.10"
+
+    // test
+    ext.mockitoKotlinVersion = '2.2.0'
+
+
     repositories {
         google()
         mavenCentral()

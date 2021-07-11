@@ -6,6 +6,15 @@ import com.example.newsapp.data.repository.MainRepository
 import com.example.newsapp.utils.Resource
 import kotlinx.coroutines.Dispatchers
 
+/**
+ * This is the viewModel class which hold he MainActivity data
+ * Coroutines is used to handle network call
+ *
+ * @param mainRepository - repository which handle API call
+ *
+ * @author SandeepK
+ * @version 1.0
+ * */
 class MainViewModel(private val mainRepository: MainRepository) : ViewModel() {
 
     fun getTopHeadlines(url:String) = liveData(Dispatchers.IO) {

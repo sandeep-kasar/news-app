@@ -9,21 +9,22 @@ import com.example.newsapp.R
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
+/**
+ * This class is used to handle FCM notification
+ *
+ * @author SandeepK
+ * @version 1.0
+ */
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     private var TAG = "Firebase"
 
     /**
-     * Called if the FCM registration token is updated. This may occur if the security of
-     * the previous token had been compromised. Note that this is called when the
-     * FCM registration token is initially generated so this is where you would retrieve the token.
+     * Called if the FCM registration token is updated.
      */
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed token: $token")
-
-        // If you want to send messages to this application instance or
-        // manage this apps subscriptions on the server side, send the
-        // FCM registration token to your app server.
+        // FCM registration token to your app server for further use case
         sendRegistrationToServer(token)
     }
 
@@ -31,6 +32,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         //send token to server
     }
 
+    /**
+     * This method is for received the FCM notification message
+     *
+     * @param remoteMessage: RemoteMessage
+     */
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
@@ -45,14 +51,20 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         // Check if message contains a notification payload.
         remoteMessage.notification?.let {
             Log.d(TAG, "Message Notification Body: ${it.body}")
+            // generate notification
             handleNow(it.title!!, it.body!!)
         }
-
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
     }
 
 
+    /**
+     * This function will generate notification when app is in foreground
+     *
+     * @param title:String, this is the title of notification
+     *
+     * @param body:String, this is the body of notification
+     *
+     * */
     private fun handleNow(title:String,body:String){
         // Create an explicit intent for an Activity in your app
         val intent = Intent(this, this::class.java).apply {
