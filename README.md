@@ -8,3 +8,9 @@ News App is a simple news app which uses [NewsAPI](https://newsapi.org/) to fetc
 5. Unit tests
 6. Code structuring, style and comments
 
+### Also find the project [NewsApp](https://gitlab.com/sandeepk784/NewsApp) with CICD pipeline
+### The CICD implementation done with:
+1. Gitlab
+2. Fastlane
+3. Docker
+4. Firebase
