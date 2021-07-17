@@ -1,6 +1,6 @@
 # NewsApp
 News App is a simple news app which uses [NewsAPI](https://newsapi.org/) to fetch top news headlines from the API.
-### The codebase focuses On:
+#### The codebase focuses On:
 1. Kotlin + Coroutines
 2. MVVM design pattern
 3. Data binding
@@ -8,7 +8,7 @@ News App is a simple news app which uses [NewsAPI](https://newsapi.org/) to fetc
 5. Unit tests
 6. Code structuring, style and comments
 
-### Also find the project [NewsApp](https://gitlab.com/sandeepk784/NewsApp) with CICD pipeline
+#### Also find the project [NewsApp](https://gitlab.com/sandeepk784/NewsApp) with CICD pipeline
 1. Gitlab
 2. Fastlane
 3. Docker
