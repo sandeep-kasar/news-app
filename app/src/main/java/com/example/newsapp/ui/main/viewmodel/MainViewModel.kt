@@ -3,7 +3,7 @@ package com.example.newsapp.ui.main.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.example.newsapp.data.repository.MainRepository
-import com.example.newsapp.utils.Resource
+import com.example.newsapp.utils.response.Resource
 import kotlinx.coroutines.Dispatchers
 
 /**

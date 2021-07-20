@@ -1,4 +1,4 @@
-package com.example.newsapp.utils
+package com.example.newsapp.utils.response
 
 /**
  * This is the data class to return response

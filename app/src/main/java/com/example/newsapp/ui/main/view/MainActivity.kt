@@ -1,25 +1,33 @@
 package com.example.newsapp.ui.main.view
 
 import android.content.Context
-import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.R
 import com.example.newsapp.data.api.ApiHelper
 import com.example.newsapp.data.api.RetrofitBuilder
 import com.example.newsapp.data.model.NewsArticle
+import com.example.newsapp.data.room.NewsDatabase
+import com.example.newsapp.databinding.ActivityMainBinding
 import com.example.newsapp.ui.base.ViewModelFactory
 import com.example.newsapp.ui.main.adapter.MainAdapter
 import com.example.newsapp.ui.main.viewmodel.MainViewModel
-import com.example.newsapp.utils.CountrySelectorDialog
-import com.example.newsapp.utils.Status.*
-import kotlinx.android.synthetic.main.activity_main.*
+import com.example.newsapp.utils.dialog.CountrySelectorDialog
+import com.example.newsapp.data.room.NewsMapper
+import com.example.newsapp.utils.NetworkUtils
+import com.example.newsapp.utils.response.Status.*
+import com.example.newsapp.utils.toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * This activity is the starting point of the application
@@ -28,14 +36,16 @@ import kotlinx.android.synthetic.main.activity_main.*
  * @version 1.0
  * */
 
-class MainActivity : AppCompatActivity(), CountrySelectorDialog.SelectionDialogListener {
+class MainActivity : AppCompatActivity(), CountrySelectorDialog.SelectionDialogListener, NewsMapper {
 
     private lateinit var viewModel: MainViewModel
     private lateinit var adapter: MainAdapter
+    private lateinit var mainBinding: ActivityMainBinding
+    private lateinit var newsDatabase: NewsDatabase
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
         setupViewModel()
         setupUI()
     }
@@ -58,11 +68,19 @@ class MainActivity : AppCompatActivity(), CountrySelectorDialog.SelectionDialogL
      * and handle click events
      *
      * */
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun setupUI() {
+
+        // init
+        newsDatabase = NewsDatabase.buildDefault(applicationContext)
+
+        //binding layout
+        mainBinding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(mainBinding.root)
 
         // adapter setting
         adapter = MainAdapter(arrayListOf())
-        recyclerView.also {
+        mainBinding.recyclerView.also {
             it.layoutManager = LinearLayoutManager(this)
             it.setHasFixedSize(true)
             it.adapter = adapter
@@ -83,7 +101,7 @@ class MainActivity : AppCompatActivity(), CountrySelectorDialog.SelectionDialogL
         }
 
         // refresh layout setting
-        swipeRefreshLayout.setOnRefreshListener {
+        mainBinding.swipeRefreshLayout.setOnRefreshListener {
              setupObservers(countryCode.text.toString().trim())
         }
 
@@ -92,8 +110,11 @@ class MainActivity : AppCompatActivity(), CountrySelectorDialog.SelectionDialogL
     /**
      * Define observer to observe API call data from viewModel/Livedata
      *
-     * Call to news API
+     * Check internet connection, If network is available then call API
+     * else show data from local database/room
+     *
      * */
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun setupObservers(country:String) {
 
         // set users country
@@ -102,30 +123,56 @@ class MainActivity : AppCompatActivity(), CountrySelectorDialog.SelectionDialogL
         tvCountryCode.text = country
 
         // disable swipeRefreshLayout
-        if (swipeRefreshLayout.isRefreshing) {
-            swipeRefreshLayout.isRefreshing = false;
+        if (mainBinding.swipeRefreshLayout.isRefreshing) {
+            mainBinding.swipeRefreshLayout.isRefreshing = false;
         }
 
         // generate API call url
         val apiUrl = RetrofitBuilder.SUB_URL_HEAD + country + RetrofitBuilder.SUB_URL_TAIL
 
-        // Call to news API
-        viewModel.getTopHeadlines(apiUrl).observe(this, Observer {
-            it?.let { resource ->
-                when (resource.status) {
-                    SUCCESS -> {
-                        recyclerView.visibility = View.VISIBLE
-                        progressBar.visibility = View.GONE
-                        resource.data?.let { newsResponse -> retrieveList(newsResponse.articles) }
+        // check network connection and then call API
+        NetworkUtils.getNetworkLiveData(applicationContext).observe(this, Observer { isConncted ->
+            if (isConncted) {
+                // Call to news API
+                viewModel.getTopHeadlines(apiUrl).observe(this, Observer {
+                    it?.let { resource ->
+                        when (resource.status) {
+                            SUCCESS -> {
+                                mainBinding.recyclerView.visibility = View.VISIBLE
+                                mainBinding.progressBar.visibility = View.GONE
+                                resource.data?.let { newsResponse -> retrieveList(newsResponse.articles) }
+                            }
+                            ERROR -> {
+                                mainBinding.recyclerView.visibility = View.VISIBLE
+                                mainBinding.progressBar.visibility = View.GONE
+                                Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+                            }
+                            LOADING -> {
+                                mainBinding.progressBar.visibility = View.VISIBLE
+                                mainBinding.recyclerView.visibility = View.GONE
+                            }
+                        }
                     }
-                    ERROR -> {
-                        recyclerView.visibility = View.VISIBLE
-                        progressBar.visibility = View.GONE
-                        Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
-                    }
-                    LOADING -> {
-                        progressBar.visibility = View.VISIBLE
-                        recyclerView.visibility = View.GONE
+                })
+            }else {
+
+                // show local data if there is no internet connection
+                // do task on IO thread
+                lifecycleScope.launch(Dispatchers.IO) {
+                    if (newsDatabase.newsArticlesDao().getNewsArticles().isNotEmpty()) {
+                        val newsArticleDatabase = newsDatabase.newsArticlesDao().getNewsArticles()
+                        val newsArticles = newsArticleDatabase.toRemote()
+                        runOnUiThread {
+                            mainBinding.recyclerView.visibility = View.VISIBLE
+                            mainBinding.progressBar.visibility = View.GONE
+                            retrieveList(newsArticles)
+                        }
+                    } else {
+                        runOnUiThread {
+                            mainBinding.recyclerView.visibility = View.VISIBLE
+                            mainBinding.progressBar.visibility = View.GONE
+                            toast("Empty data",Toast.LENGTH_LONG)
+                        }
                     }
                 }
             }
@@ -143,8 +190,15 @@ class MainActivity : AppCompatActivity(), CountrySelectorDialog.SelectionDialogL
             addNewsArticle(newsArticle)
             notifyDataSetChanged()
         }
+
+        // save data in local db
+        lifecycleScope.launch(Dispatchers.IO) {
+            newsArticle?.toStorage()?.let { newsDatabase.newsArticlesDao().clearAndCacheArticles(it) }
+        }
+
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCountryClick(country: String) {
         saveUsersChoice(country)
     }
@@ -156,6 +210,7 @@ class MainActivity : AppCompatActivity(), CountrySelectorDialog.SelectionDialogL
      * @param countryCode - users selected country code
      *
      * */
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun saveUsersChoice(countryCode: String){
 
         // check users country is available or not in shared pref

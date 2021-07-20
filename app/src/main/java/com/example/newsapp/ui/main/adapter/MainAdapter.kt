@@ -65,6 +65,5 @@ class MainAdapter(
             clear()
             addAll(newsArticle)
         }
-
     }
 }

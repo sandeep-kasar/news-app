@@ -1,4 +1,4 @@
-package com.example.newsapp.utils
+package com.example.newsapp.service
 
 import android.app.PendingIntent
 import android.content.Intent

@@ -1,9 +1,8 @@
-package com.example.newsapp.utils
+package com.example.newsapp.utils.dialog
 
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.example.newsapp.R
